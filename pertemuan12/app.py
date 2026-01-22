@@ -29,6 +29,21 @@ from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
+def get_status(judul):
+    judul = judul.lower()
+
+    negatif = [
+        "terlewat", "kecelakaan", "macet", "meninggal", "kebakaran",
+        "gempa", "longsor", "korban", "macet", "berdirinya", "jurang", "anggaran", "bantuan", "meluap", "lembap", "gerhana", "waspada"
+    ]
+
+    for k in negatif:
+        if k in judul:
+            return "merah"
+
+    return "hijau"
+
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -50,11 +65,14 @@ def detik_populer():
         tanggal = item.find("div", class_="media__date")
 
         data.append({
-            "judul": img["title"] if img and img.has_attr("title") else "",
-            "url": link_tag["href"] if link_tag else "#",
-            "tanggal": tanggal.text.strip() if tanggal else "",
-            "gambar": img["src"] if img and img.has_attr("src") else ""
-        })
+  "judul": img["title"] if img and img.has_attr("title") else "",
+    "url": link_tag["href"] if link_tag else "#",
+    "tanggal": tanggal.text.strip() if tanggal else "",
+    "gambar": img["src"] if img and img.has_attr("src") else "",
+   "status": get_status(img["title"]) if img else "hijau"
+
+})
+
 
     return render_template("index.html", data=data)
 
